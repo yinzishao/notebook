@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Runs during git flow release finish and a tag message is given
+#
+# Positional arguments:
+# $1 Message
+# $2 Full version
+#
+# Return MESSAGE
+#
+# The following variables are available as they are exported by git-flow:
+#
+# MASTER_BRANCH - The branch defined as Master
+# DEVELOP_BRANCH - The branch defined as Develop
+
+MESSAGE="$1"
+VERSION="$2"
+
+# Implement your script here.
+
+(echo "### $VERSION";git log -1 --pretty="#### %ci";printf "\n";echo "${MESSAGE}";printf "\n---\n\n";cat ./CHANGELOG.md) > ./tmp_changelog.md
+
+(mv ./tmp_changelog.md ./CHANGELOG.md && git add ./CHANGELOG.md && git commit --amend --no-edit) > /dev/null
+
+echo $MESSAGE
+
+exit 0

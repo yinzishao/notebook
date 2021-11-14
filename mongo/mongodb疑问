@@ -1,0 +1,157 @@
+什么是服务器进行时钟同步。（23.6.1）								p20
+辅助函数											p24
+驱动程序	插入数据做大量的数据校验									p31
+"$slice"的值必须是负整数？如何前后？还是跟$push组合的时候有这个限制				P39
+7、基于位置的数组修改器，定位操作符$								p41
+"push"成为瓶颈使用第八章的方法									p44
+usePowerOf2Sizes参数，打乱顺序有什么影响？							p45
+其他一些写入安全机制
+第十一章讲述多服务器之间的写入安全，第十九章写入提交						p51
+查询优化器不会对$and进行优化，
+为什么改了之后有优化(没用$and)									p58
+4.使用$操作符得到第一个匹配的元素？？$的作用							p62
+第五章索引	min() max()									p63
+$where	文档从BSON??转换成javascript象								p66
+作用域？、驱动程序：特殊类型向数据库传递代码
+作用域是用于表示变量名和值的映射的文档。								p67
+大多数据库都会在索引中保存更多的元数据？？用于处理skip						p70
+javascript的Math库，Math.floor的意义？								p71
+4.5.3 高级查询选项。需要好好搜一下怎么用								p72
+命令跟字段顺序相关										p77
+explain()函数的使用方法等 5.2节详细介绍输出							p82
+db.currentOp和检查mongodb的日志的使用方法查看索引进度						p83
+通常，在一个特定?的集合上，不应该拥有两个以上的索引。
+索引技巧：use the index,Luke	http://use-the-index-luke.com					p84
+5.1.2 选择键的方向
+查询优化器										p103
+BSON 中的类c类型 									p388
+保留集合？(数据库索引)									p107
+循环游标关闭时自动重新执行查询是非常重要！						p115
+全文本搜索 不支持？
+第十八章如何在创建索引时将对应用程序的影响降至最低					p117
+什么是多键字段？									
+usePowerOf2Sizes选项控制空间的分配方式							p121
+2dsphere 允许使用GeoJSON格式
+2d 跟 2dsphere的区别？扁平表面？球体表面？						p123
+理解GirdFS底层规范，实现一些没有提供的辅助功能						p128
+分组行为、分片、两个操作符不支持流式$group和$sort						p140
+$match迅速减少结果集的大小，可以使用管道进行实时聚合??????。
+由于管道不断包含更多文档，越来越复杂，几乎不可能实时得到管道的操作结果。			p142
+
+作用域。何为指定传递代码的作用域？参数？作用域键scope(传参)				p148
+最终数据一致和中间阶段的数据一致								p159
+usePowerOf2Size,以确保users集合尽可能小。不过多影响users集合的前提下对其进行压缩。		p161
+提高更新效率，深入了解优化数据库。提高写入读取操作					p162
+为什么检查填充因子 大于1.2，考虑手动填充							p162
+事务：执行操作前先检查锁？？								p167
+配置副本集，如何自动选出一个主节点							
+无法将单机服务器转换为副本集？？停机							p177
+如何副本集的所有成员都运行在同一台机器上							p178
+数据中心？？p182
+副本集设为只读的时候，将导致程序暂时无法写入程序 
+否决票相当于10 000张赞成票？ p183
+也不能对所有成员优先级都为0的副本集执行reconfig？？		p186
+初始化同步！！！p190 https://docs.mongodb.com/manual/core/replica-set-sync/	p190
+陈旧数据产生的原因？有太多的读请求？？						p193
+要将被回滚的操作应用到当前主节点？？						p198！！！
+副本集会在后台默默进行？热备份？	p201
+驱动程序使用与MongoClient？	p201
+扩展getLastError的使用。	p204
+primary 选项究竟是读还是写？可接受选项？	p208
+分片，分布式负载 第13章	p208
+分片进行低延迟的写	p209
+重放应用使用记录	p319
+右平衡 
+不要用数据库引用
+索引排序方向！！
+
+
+
+-----------------------------------------------------------------------------------------------
+------------------------------------分割线-----------------------------------------------------
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+
+书本错误：
+p39页。$slice的值必须是负整数？保留前十个？
+p92页第五行没有右括号）
+p102页hint()写错成hit()
+p207 p208 写请求？应该是读请求吧？
+
+
+
+
+-----------------------------------------------------------------------------------------------
+------------------------------------分割线-----------------------------------------------------
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+Q：
+mongoimport Date expecting integer milliseconds
+
+A:
+using an older version of mongoimport that only supports milliseconds. You can either upgrade to a newer production release of MongoDB, or format your $date strings in milliseconds as required
+mongoose 用的bulk 但我的数据库是2.4版本的，不支持initializeUnorderedBulkOp
+-----------------------------------------------------------------------------------------------
+------------------------------------分割线-----------------------------------------------------
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+
+Q:如何根据某个键的某个范围聚合：
+timestamp 在当天范围聚合
+
+
+A:
+第一种办法：
+
+First thing is your date is stored in timestamp so you need to first convert timestamp to ISODate using adding new Date(0) and multiply timestamp to 1000 then you will get the ISODate like this :
+
+{"$add":[new Date(0),{"$multiply":[1000,"$LASTLOGIN"]}]} this convert to timestamp to ISODate.
+
+then extract $year, $month, $dayOfMonth parts from the converted date which you can then use in your $group pipeline to group the documents by the day.
+
+db.getCollection('searches').aggregate({
+    $project : {
+            _id : "$_id",
+            dt : {$add: [new Date(0), "$timestamp"]}
+        }
+    },
+    { 
+        $project : {
+            _id : "$_id",
+            date : { 
+                hour : {$month : "$dt"} 
+            }
+        }
+    }
+    )
+
+> 需要两次project不然报错："errmsg" : "exception: the $year operator does not accept an object as an operand"
+
+第二种办法：
+You have to convert your timestamp values into Date objects so that you can group by day.
+
+Using Rachel's answer as a starting point (in the shell):
+```
+db.test.group({
+  keyf: function(doc) {
+    var date = new Date(doc.timestamp*1000);
+    var dateKey = (date.getMonth()+1) + "/" + 
+                  date.getDate() + "/" + 
+                  date.getFullYear();
+    return {day: dateKey};
+  },
+  initial: {value: 0},
+  reduce: function(curr, result) { result.value += curr.value; }
+});
+```
+returns:
+```
+[
+  {
+    "day": "5/4/2011",
+    "value": 8
+  }
+]
+```
+
+

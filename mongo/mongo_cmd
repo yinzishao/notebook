@@ -1,0 +1,246 @@
+mongod --dbpath=data/db --fork --logpath=log/mongodb.log
+
+mongoimport --db users --collection contacts --file contacts.json
+
+mongoexport --db test --collection traffic --out traffic.json
+
+for(var i=0;i < 1000;i++){ db.tester.insert({"foo":"bar","baz":i,"z":10-i}) }
+
+db.getCollectionNames();
+
+db.tester.find({"z":{$lt:-987}})
+
+db.tester.distinct("z")
+
+db.tester.update({"title":"My blog post"},{"$set":{"content":"new content"}})
+
+db.tester.update({"title":"My blog post"},{"$unset":{"content":1}})
+
+db.tester.update({"title":"My blog post"},{"$inc":{"score":66}})
+
+db.tester.update({
+  title: 'My blog post'
+}, {
+  $push: {
+    comments: {
+      name: 'jie',
+      content: 'nice post!'
+    }
+  }
+});
+
+db.tester.update({
+  title: 'My blog post'
+}, {
+  $push: {
+    slice: {
+      "$each": ['jie',2,3,4,5,6,7,8,9,0],
+      "$slice":-10
+    }
+  }
+});
+
+db.tester.update({
+  title: 'My blog post'
+}, {
+  "$pop": {"slice":-1}
+  }
+);
+================================================================================
+##定位操作符
+================================================================================
+//查询匹配的文档中，数组有2个88，只更新第一个匹配的元素，也就是"grades.1"
+db.students.update( { _id: 1, grades: 88 }, { $set: { "grades.$" : 82 } }) ;
+//查询文档中没有出现grades字段，查询报错
+db.students.update( { _id: 2 }, { $set: { "grades.$" : 82 } } );
+
+db.blog.update({"comments.author":"John"},
+{"$set":{"comments.$.author":"Jim"}})
+
+也就是查询文档出现该字段，才能使用该字段的$
+
+数组查找，返回一个匹配的！数组！元素。可以使用$操作符得到一个匹配的元素
+
+db.analytics.update({
+  url: '/blog'
+}, {
+  $inc: {
+    pageviews: 1
+  }
+}, true);
+
+{ "_id" : ObjectId("57b93cdf4a1a99c217562c54"), "url" : "/blog", "pageviews" : 1 }
+
+
+
+db.runCommand(
+   {
+     findAndModify: "people",
+     query: { name: "Andy" },
+     sort: { rating: 1 },
+     update: { $inc: { score: 1 } },
+     upsert: true
+   }
+ )
+
+{ "_id" : ObjectId("57b9768d4a1a99c217562c56"), "name" : "Andy", "score" : 1 }
+删除
+ db.runCommand(    {      findAndModify: "people",      query: { name: "Andy" },      sort: { rating: 1 },      remove: true   }  )
+================================================================================
+##GROUP
+================================================================================
+db.runCommand(
+   {
+     group:
+       {
+         ns: 'orders',
+         key: { ord_dt: 1, 'item.sku': 1 },
+         cond: { ord_dt: { $gt: new Date( '01/01/2012' ) } },
+         $reduce: function ( curr, result ) { },
+         initial: { }
+       }
+   }
+)
+
+SELECT ord_dt, item_sku
+FROM orders
+WHERE ord_dt > '01/01/2012'
+GROUP BY ord_dt, item_sku
+------------------------------------------------------------
+Calculate the Sum
+
+db.runCommand(
+   { group:
+       {
+         ns: 'orders',
+         key: { ord_dt: 1, 'item.sku': 1 },
+         cond: { ord_dt: { $gt: new Date( '01/01/2012' ) } },
+         $reduce: function ( curr, result ) {
+                     result.total += curr.item.qty;
+                  },
+         initial: { total : 0 }
+       }
+    }
+)
+
+SELECT ord_dt, item_sku, SUM(item_qty) as total
+FROM orders
+WHERE ord_dt > '01/01/2012'
+GROUP BY ord_dt, item_sku
+------------------------------------------------------------
+
+db.runCommand(
+   {
+     group:
+       {
+         ns: 'orders',
+         $keyf: function(doc) {
+                    return { day_of_week: doc.ord_dt.getDay() };
+                },
+         cond: { ord_dt: { $gt: new Date( '01/01/2012' ) } },
+         $reduce: function( curr, result ) {
+                      result.total += curr.item.qty;
+                      result.count++;
+                  },
+         initial: { total : 0, count: 0 },
+         finalize: function(result) {
+                      var weekdays = [
+                           "Sunday", "Monday", "Tuesday",
+                           "Wednesday", "Thursday",
+                           "Friday", "Saturday"
+                          ];
+                      result.day_of_week = weekdays[result.day_of_week];
+                      result.avg = Math.round(result.total / result.count);
+                   }
+       }
+   }
+)
+------------------------------------------------------------
+#索引
+
+for (i=0;i<100000;i++){
+db.user.insert(
+{
+"i":i,
+"username":"user"+i,
+"age":Math.floor(Math.random()*120),
+"created":new Date()
+}
+);
+}
+
+db.user.ensureIndex({"age":1,"username":1})
+db.user.find({"age":{"$gte":21,"$lte":30}}).sort({"username":1}).explain(true)
+db.user.find({"username":{"$gte":"user2","$lte":"user6"}}).sort({"age":1}).explain(true)
+
+------------------------------------------------------------
+$where
+
+db.foo.find({
+  '$where': function() {
+    var current, other;
+    for (current in this) {
+      for (other in this) {
+        if (current !== other && this[current] === this[other]) {
+          return true;
+        }
+      }
+    }
+  }
+});
+
+
+------------------------------------------------------------
+aggregate()
+
+db.zipcodes.aggregate(
+{"$group":{"_id":"$state","totalPop":{"$sum":"$pop"}}},
+{"$match":{"totalPop":{"$gte":10*1000*1000}}}
+)
+
+SELECT state, SUM(pop) AS totalPop
+FROM zipcodes
+GROUP BY state
+HAVING totalPop >= (10*1000*1000)
+
+返回所有城市有两个以上的区
+db.zipcodes.aggregate(
+{"$group":{"_id":{state:"$state",city:"$city"},"avgPop":{"$avg":"$pop"},"count":{"$sum":1}}},
+{"$match":{"count":{"$ne":1}}},
+{"$sort":{"count":-1}}
+)
+
+db.zipcodes.aggregate(
+   { $group: { _id: { state: "$state", city: "$city" }, pop: { $sum: "$pop" } } },
+   { $group: { _id: "$_id.state", avgCityPop: { $avg: "$pop" } } }
+ )
+
+每个州最大最小的城市：
+db.zipcodes.aggregate( [
+   { $group: { _id: { state: "$state", city: "$city" }, pop: { $sum: "$pop" } } },
+   { $group: { _id: "$_id.state", maxCityPop: { $max: "$pop" },minCityPop: { $min: "$pop" } } }
+] )
+
+每个州最大最小的城市：
+db.zipcodes.aggregate( [
+   { $group: { _id: { state: "$state", city: "$city" }, pop: { $sum: "$pop" } } },
+   {$sort:{pop:-1}},
+   { $group: {
+        _id: "$_id.state",
+        biggestPop: { $first: "$pop" },
+        biggestCity:{ $first:"$_id.city"},
+        smallestPop: { $last: "$pop" },
+        smallestCity:{$last:"$_id.city"}
+
+        }
+    },
+    { $project:
+    { _id: 0,
+      state: "$_id",
+      biggestCity:  { name: "$biggestCity",  pop: "$biggestPop" },
+      smallestCity: { name: "$smallestCity", pop: "$smallestPop" }
+    }
+  }
+] )
+
+

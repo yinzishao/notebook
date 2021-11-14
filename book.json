@@ -1,0 +1,24 @@
+{
+    "structure": {
+        "readme": "README.md"
+    },
+    "ignores": ["_book", "node_modules"],
+    "plugins": [
+        "-lunr", "-search", "search-pro",
+        "-highlight", "prism",
+        "back-to-top-button",
+        "chapter-fold",
+        "expandable-chapters",
+        "page-toc-button",
+        "code",
+        "splitter",
+        "lightbox"
+    ],
+    "pluginsConfig": {
+        "prism": {
+            "lang": {
+                "shell": "bash"
+            }
+        }
+    }
+}
