@@ -251,3 +251,52 @@ https 则需要生成access-token VNdA5Ym5WhvsWygy8NQZ
 - [Go编程时光](http://golang.iswbm.com/en/latest/)
 
 第二章：面向对象，第四章：并发编程。讲的都是比较贴切实际。特别是context的介绍。可以用作go的常见查阅资料。
+
+---
+
+
+# 那如何判断动态值是否为空？
+
+> https://blog.csdn.net/lanyang123456/article/details/83715090
+
+可以借助反射来判断。
+
+```go
+func IsNil(i interface{}) bool {
+    defer func() {
+        recover()
+    }()
+    vi := reflect.ValueOf(i)
+    return vi.IsNil()
+}
+
+```
+
+其中，`IsNil`定义如下：
+
+```go
+func (v Value) IsNil() bool
+
+```
+
+参数v必须是`chan, func, interface, map, pointer, or slice`，否则会panic。
+
+如果调用IsNil的不是一个指针，会出现异常，需要捕获异常。
+或者修改成这样：
+
+```go
+func IsNil(i interface{}) bool {
+    vi := reflect.ValueOf(i)
+    if vi.Kind() == reflect.Ptr {
+        return vi.IsNil()
+    }
+    return false
+}
+
+```
+
+## 总结
+
+一个接口包括动态类型和动态值。 如果一个接口的动态类型和动态值都为空，则这个接口为空的。
+
+> 应该尽量避免使用这样的场景
