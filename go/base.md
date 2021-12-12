@@ -149,7 +149,7 @@ go run *.go
 _ 是包引用操作，只会执行包下各模块中的 init 方法，并不会真正的导入包，所以不可以调用包内的其他方法
 
 
-`go get` 就会自动地获取、构建并安装它, -d 只下载 不安装
+`go get` 就会自动地获取、构建并安装它, -d 只下载 不安装  -x 显示相关的调试日志。
 
 指定的包不在工作空间中，go get 就会将会将它放到 GOPATH 指定的第一个工作空间内
 
@@ -300,3 +300,21 @@ func IsNil(i interface{}) bool {
 一个接口包括动态类型和动态值。 如果一个接口的动态类型和动态值都为空，则这个接口为空的。
 
 > 应该尽量避免使用这样的场景
+
+---
+# panic: assignment to entry in nil map
+
+
+> - [panic: assignment to entry in nil map](https://www.cnblogs.com/liuqun/p/14161134.html)
+
+golang中map是引用类型，应用类型的变量未初始化时默认的zero value是nil。直接向nil map写入键值数据会导致运行时错误
+
+panic: assignment to entry in nil map
+
+因为在声明alphabetMap后并未初始化它，所以它的值是nil, 不指向任何内存地址。需要通过make方法分配确定的内存地址。程序修改后即可正常运行:
+
+同为引用类型的slice，在使用append 向nil slice追加新元素就可以，原因是append方法在底层为slice重新分配了相关数组让nil slice指向了具体的内存地址
+
+
+
+

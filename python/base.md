@@ -1,3 +1,13 @@
+# 内存
+
+Q: 请教个问题，发现python的服务占用内存过高，有没有什么比较好的方法可以不重启服务直接dump内存的，类似于java的jmap
+
+A:
+- pyrasite，不过估计用处不大，大概率发现都是 dict / list / tuple 类型数据占用过多
+- 用pympler因为内存增加很慢排查时间比较久
+- 可以试试objectgraph,之前python遇到过一个内存泄露的，问题是循环引用，最后weakref解决了。
+
+
 # pdb
 
 pdb有2种用法：
