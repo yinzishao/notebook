@@ -1,3 +1,51 @@
+# 打标签
+
+
+```shell
+git tag -a v1.2.0 -m "new version"
+
+```
+
+显示标签以及备注，这个是按照tag的version的顺序排序，并非按照tag的时间顺序
+
+
+```shell
+git tag -n
+
+```
+
+实现标签以及备注，按照打标签的时间排序，这个应该是最可能使用的，反正我版本多了之后，就是用这个命令查看。
+
+
+```shell
+git tag -n --sort=taggerdate
+
+```
+
+–sort=key，关于key的值可以参考 [ https://git-scm.com/docs/git-for-each-ref](https://git-scm.com/docs/git-for-each-ref)
+想看同时有时间、tag、tag备注的，可以使用如下命令
+
+
+```shell
+git for-each-ref --sort=taggerdate --format '%(refname:short) %(taggerdate:short) %(subject)'
+
+```
+
+可以对某个版本进行补打标签,commitId只要填入前7位即可
+
+
+```shell
+git tag -a v1.2 4e8223a
+
+```
+
+删除标签，并不会删除版本，只是删除标签而已。
+
+
+```shell
+git tag -d v1.2
+```
+
 # alias
 
 ```bash
