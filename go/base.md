@@ -1,3 +1,23 @@
+# atomic
+
+> [Go：有了 sync 为什么还有 atomic？](https://mp.weixin.qq.com/s?__biz=MzAxMTA4Njc0OQ==&mid=2651451642&idx=1&sn=8626afd9df7dbbf63855784a6e628368&scene=21#wechat_redirect)
+
+atomic 不是灵丹妙药，它显然不能替代互斥锁，但是当涉及到可以使用读取-复制-更新[1]模式管理的共享资源时，它非常出色。在这种技术中，我们通过引用获取当前值，当我们想要更新它时，我们不修改原始值，而是替换指针（因此没有人访问另一个线程可能访问的相同资源）。前面的示例无法使用此模式实现，因为它应该随着时间的推移扩展现有资源而不是完全替换其内容，但在许多情况下，读取-复制-更新是完美的。
+
+
+> 只有一个地方写，多个地方读，可以直接通过cow的方式进行原子指针赋值操作减少并发竞争状态
+
+# unused
+
+golang有什么轮子能找到从未被调用的函数和逻辑么 手动清理没调用的函数太累了
+
+
+https://github.com/dominikh/go-tools/tree/master/unused
+
+
+golangci-lint / staticcheck 里有个叫 unused 的 checker
+
+
 ## pprof
 
 > - [golang 内存分析/内存泄漏](https://cloud.tencent.com/developer/article/1703742)
