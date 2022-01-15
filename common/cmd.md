@@ -171,7 +171,7 @@ ${var}Hello 打印出了想要的结果，用 {} 把 var 括起来，**明确指
 "$var"Hello 用双引号把 $var 括起来，也可以跟后面的 "Hello" 字符串区分开。
 
 ```bash
-ncommitp = ! "f() { git add . && git commit -m \"${1}\" && git push && cd notebook && git add . && git commit -m \"$1\" && git push; }; f"
+ncommitp = ! "f() { git add . && ./work/precommit.sh && git commit -m \"${1}\" && git push && cd notebook && git add . && git commit -m \"$1\" && git push; }; f"
 ```
 
 function里面如果漏了`\"`去获取${1}，那么alias传进去的内容，如果带空格，会变成多个变量，导致错误。
