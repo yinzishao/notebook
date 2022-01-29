@@ -529,6 +529,14 @@ docker ps
 docker logs mymysql
 
 docker exec -it mymysql bash
+
+
+docker run -itd --name mysql-test -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
+
+docker run -itd --name mysql-test-5.7 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7
+
+docker run -p 3306:3306 --name mysql-test-5.7 -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456  mysql:5.7
+
 ```
 
 ```sql

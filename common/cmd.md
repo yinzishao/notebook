@@ -359,6 +359,14 @@ mysql-wor 19177 youmi   21u  IPv4 752190      0t0  TCP localhost:33194->localhos
 mysql-wor 19177 youmi   23u  IPv4 755266      0t0  TCP localhost:33196->localhost:mysql (ESTABLISHED)
 ```
 
+
+```shell
+lsof -i -n -P | grep ___648go_
+```
+
+-P 禁用端口号到端口名的转换，从而加快了输出速度
+-n 禁止将网络号转换为主机名(network numbers to host names)。与上面的-P一起使用时，它可以显着加快lsof的输出
+
 ---
 # netstat
 `netstat -tunlp|grep` 端口号，用于查看指定端口号的进程情况，如查看3306端口的情况
