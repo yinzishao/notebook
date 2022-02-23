@@ -378,5 +378,84 @@ panic: assignment to entry in nil map
 同为引用类型的slice，在使用append 向nil slice追加新元素就可以，原因是append方法在底层为slice重新分配了相关数组让nil slice指向了具体的内存地址
 
 
+----
+# Go内存管理之代码的逃逸分析
 
+- [Go内存管理之代码的逃逸分析](https://mp.weixin.qq.com/s?__biz=MzUzNTY5MzU2MA==&mid=2247485579&idx=1&sn=f481cff4ffccacc186a020e45e884924&scene=21#wechat_redirect)
+
+Q：如何得知变量是分配在栈（stack）上还是堆（heap）上？
+
+A: 准确地说，你并不需要知道。Golang 中的变量只要被引用就一直会存活，存储在堆上还是栈上**由内部实现决定**而和具体的语法没有关系。知道变量的存储位置确实对程序的效率有帮助。如果可能，Golang 编译器会将函数的局部变量分配到函数栈帧（stack frame）上。然而，如果编译器**不能确保变量在函数 return 之后不再被引用，编译器就会将变量分配到堆上**。而且，如果**一个局部变量非常大**，那么它也应该被分配到堆上而不是栈上。当前情况下，**如果一个变量被取地址**，那么它就有可能被分配到堆上。然而，还要对这些变量做逃逸分析，如果函数 return 之后，变量不再被引用，则将其分配到栈上
+
+简单来说，逃逸分析也是了解我们应该如何优化应用程序性能的一种方式。通过上面的分析可以看出来，**虽然指针能够减少变量在函数间传递时的数据值拷贝问题**，但是也不应该所有类型的数据都应该返回其指针。**如果分配到堆上的共享变量太多的话也无形中增加了GC的压力。**
+
+- [生产环境Go程序内存泄露，用pprof如何快速定位](https://mp.weixin.qq.com/s/PEpvCqpi9TPhVuPdn3nyAg)
+
+
+---
+# 切片
+
+- [Go 切片这道题，吵了一个下午！](https://mp.weixin.qq.com/s?__biz=MzUxMDI4MDc1NA==&mid=2247491675&idx=1&sn=5a887e874999251201c90744434d2471&scene=21#wechat_redirect)
+
+```go
+func main() {
+ sl := make([]int, 0, 10)
+ var appenFunc = func(s []int) {
+  s = append(s, 10, 20, 30)
+ }
+ appenFunc(sl)
+ fmt.Println(sl)
+ fmt.Println(sl[:10])
+}
+
+```
+
+结果：
+```
+[]
+[10 20 30]
+[]
+[10 20 30 0 0 0 0 0 0 0]
+```
+
+go的切片传递，更改了数据会影响外层，但是外层的len没有变化。
+
+
+
+- [又吵起来了，Go 是传值还是传引用？](https://mp.weixin.qq.com/s?__biz=MzUxMDI4MDc1NA==&mid=2247489302&idx=1&sn=c787d1fa4546e12c7e55e880da73c91f&scene=21#wechat_redirect)
+
+```go
+func main() {
+ m := make(map[string]string)
+ m["脑子进煎鱼了"] = "这次一定！"
+ fmt.Printf("main 内存地址：%p\n", &m)
+ hello(m)
+
+ fmt.Printf("%v", m)
+}
+
+func hello(p map[string]string) {
+ fmt.Printf("hello 内存地址：%p\n", &p)
+ p["脑子进煎鱼了"] = "记得点赞！"
+}
+```
+
+结果:
+```
+main 内存地址：0xc00000e028
+hello 内存地址：0xc00000e038
+map[脑子进煎鱼了:记得点赞！]
+```
+
+`func makemap(t *maptype, hint int, h *hmap) *hmap {}`。这是创建 map 类型的底层 runtime 方法，注意其返回的是 *hmap 类型，是一个指针。也就是 Go 语言通过对 map 类型的相关方法进行封装，达到了用户需要关注指针传递的作用。
+
+
+留意到代码 value.Pointer，标准库进行了特殊处理，直接对应的值的指针地址，当然就不需要取地址符了。其在内部转换的 Data 属性，正正是 Go 语言中 slice 类型的运行时表现 SliceHeader。我们在调用 %p 输出时，是在输出 slice 的底层存储数组元素的地址。
+
+
+---
+# Go单测
+- [Go单测从零到溜系列—6.编写可测试的代码](https://mp.weixin.qq.com/s/hzVIMDhPQXtWoBIj0Aueug)
+
+不要隐式引用外部依赖（全局变量、隐式输入等），而是通过依赖注入的方式引入依赖。经过这样的修改之后，构造函数NewServer 的依赖项就很清晰，同时也方便我们编写 mock 测试代码。
 

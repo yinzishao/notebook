@@ -535,7 +535,7 @@ docker run -itd --name mysql-test -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mys
 
 docker run -itd --name mysql-test-5.7 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7
 
-docker run -p 3306:3306 --name mysql-test-5.7 -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456  mysql:5.7
+docker run -p 3306:3306 --name mysql-test-5.7 -v $PWD/conf.d:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456  mysql:5.7
 
 ```
 
@@ -553,7 +553,7 @@ FLUSH PRIVILEGES;
 
 ```
 
-【mysqld】中添加：general_log = 1
+【mysqld】中添加：general_log = 1   default-time-zone = "+08:00"
 
 【mysqld】中添加：skip-grant-tables
 
