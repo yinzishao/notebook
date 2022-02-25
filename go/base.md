@@ -459,3 +459,35 @@ map[脑子进煎鱼了:记得点赞！]
 
 不要隐式引用外部依赖（全局变量、隐式输入等），而是通过依赖注入的方式引入依赖。经过这样的修改之后，构造函数NewServer 的依赖项就很清晰，同时也方便我们编写 mock 测试代码。
 
+
+
+----
+# GO 错误
+
+- [go1.13中的错误处理(2019) - Go语言学习笔记](https://skyao.io/learning-go/feature/error/go1.13-errors.html)
+- [Working with Errors in Go 1.13 - The Go Programming Language](https://go.dev/blog/go1.13-errors)
+
+## 是否封装
+
+
+当向 error 添加额外的上下文时，无论是使用 fmt.Errorf 还是通过实现自定义类型，您都需要决定新的 error 是否应该封装原始 error。这个问题没有唯一的答案，它取决于创建新 error 的上下文。封装一个error 以将其暴露给调用者。如果这样做会暴露实现细节，则不要包装error。
+
+这时，如果你不想破坏你的客户端，即使你切换到不同的数据库包，函数必须总是返回 sql.ErrNoRows 。换句话说，包装一个错误使该错误成为你的API的一部分。如果你不想承诺在未来支持该错误作为你的API的一部分，你就不应该包装该错误。
+
+
+重要的是要记住，无论你是否封装，错误文本都是一样的。试图理解该错误的人无论用哪种方式都会得到相同的信息；选择封装是为了给程序提供额外的信息，以便他们能够做出更明智的决定，还是**为了保留抽象层而不提供该信息**。
+
+> 封装原始的错误信息，造成的影响就是外部必须依赖该原始错误，无法替换掉原始基础库。高耦合。
+
+
+
+
+---
+# gock
+
+
+- [gock:mock http 请求的实现原理及使用 - 简书](https://www.jianshu.com/p/57bb30073663)
+- [h2non/gock: HTTP traffic mocking and testing made easy in Go ༼ʘ̚ل͜ʘ̚༽](https://github.com/h2non/gock)
+- [Go单测从零到溜系列—1.mock网络测试](https://mp.weixin.qq.com/s?__biz=MzU5MjAxMDc1Ng==&mid=2247484588&idx=1&sn=6e640ea9c988a3abe4d08adc6c1cd18d&chksm=fe270fc7c95086d1379edbe1a98120ca6278c0329ee527d4490c9738a4fe15ba1b29c8b7dd88&cur_album_id=1338144742571458563&scene=189#wechat_redirect)
+
+其实 gock 主要是是改变了request Client 的 Transport。gock 定义了一个新的 Transport 替换了request Client 的 Transport (http.DefaultTransport )，新的 Transport 结构体重写了 RoundTrip 方法，主要是在这个方法对 http request 进行拦截，去匹配 mock 的 request.
