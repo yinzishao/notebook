@@ -491,3 +491,50 @@ map[脑子进煎鱼了:记得点赞！]
 - [Go单测从零到溜系列—1.mock网络测试](https://mp.weixin.qq.com/s?__biz=MzU5MjAxMDc1Ng==&mid=2247484588&idx=1&sn=6e640ea9c988a3abe4d08adc6c1cd18d&chksm=fe270fc7c95086d1379edbe1a98120ca6278c0329ee527d4490c9738a4fe15ba1b29c8b7dd88&cur_album_id=1338144742571458563&scene=189#wechat_redirect)
 
 其实 gock 主要是是改变了request Client 的 Transport。gock 定义了一个新的 Transport 替换了request Client 的 Transport (http.DefaultTransport )，新的 Transport 结构体重写了 RoundTrip 方法，主要是在这个方法对 http request 进行拦截，去匹配 mock 的 request.
+
+
+---
+# gorm
+
+> - [go - GORM doesnt update boolean field to false - Stack Overflow](https://stackoverflow.com/questions/56653423/gorm-doesnt-update-boolean-field-to-false)
+
+
+```go
+// Update attributes with `struct`, will only update non-zero fields
+db.Model(&user).Updates(User{Name: "hello", Age: 18, Active: false})
+// UPDATE users SET name='hello', age=18, updated_at = '2013-11-17 > 21:34:10' WHERE id = 111;
+
+// Update attributes with `map`
+db.Model(&user).Updates(map[string]interface{}{"name": "hello", "age": 18, "actived": false})
+// UPDATE users SET name='hello', age=18, actived=false, updated_at='2013-11-17 21:34:10' WHERE id=111;
+NOTE When upda
+```
+
+
+---
+# 值复制成本
+- [值复制成本 - Go语言101（通俗版Go白皮书）](https://gfw.go101.org/article/value-copy-cost.html)
+
+为了防止在函数传参和通道操作中因为值复制代价太高而造成的性能损失，我们**应该避免使用大尺寸的结构体和数组类型做为参数类型和通道的元素类型**，应该在这些场合下使用基类型为这样的大尺寸类型的指针类型。 另一方面，我们也要考虑到**太多的指针将会增加垃圾回收的压力**。所以到底应该使用大尺寸类型还是以大尺寸类型为基类型的指针类型做为参数类型或通道的元素类型取决于具体的应用场景。
+
+如果一个数组或者切片的元素类型是一个大尺寸类型，我们应该避免在for-range循环中使用双循环变量来遍历这样的数组或者切片类型的值中的元素。 因为，在遍历过程中，每个元素将被复制给第二个循环变量一次。
+
+---
+# Go中的nil
+- [Go中的nil - Go语言101（通俗版Go白皮书）](https://gfw.go101.org/article/nil.html)
+
+同一个类型的两个nil值可能不能相互比较
+在Go中，映射类型、切片类型和函数类型是不支持比较类型。 比较同一个不支持比较的类型的两个值（包括nil值）是非法的。 比如，下面的几个比较都编译不通过。
+
+```
+var _ = ([]int)(nil) == ([]int)(nil)
+var _ = (map[string]int)(nil) == (map[string]int)(nil)
+var _ = (func())(nil) == (func())(nil)
+```
+但是，映射类型、切片类型和函数类型的任何值都可以和类型不确定的裸nil标识符比较。
+```
+// 这几行编译都没问题。
+var _ = ([]int)(nil) == nil
+var _ = (map[string]int)(nil) == nil
+var _ = (func())(nil) == nil
+```
