@@ -376,7 +376,12 @@ panic: assignment to entry in nil map
 因为在声明alphabetMap后并未初始化它，所以它的值是nil, 不指向任何内存地址。需要通过make方法分配确定的内存地址。程序修改后即可正常运行:
 
 同为引用类型的slice，在使用append 向nil slice追加新元素就可以，原因是append方法在底层为slice重新分配了相关数组让nil slice指向了具体的内存地址
+> 这里的表述有问题，~~原因是append方法在底层为slice重新分配了相关数组让nil slice指向了具体的内存地址~~。很多资料说是slice进行初始化的时候，其实已经分配了底层结构的内容了，而不是想map一样为空。这样append才能进行分配？具体见[Go中的nil](#Go中的nil)
 
+```
+nil map doesn’t point to an initialized map. Assigning value won’t reallocate point address.
+The append function appends the elements x to the end of the slice s, If the backing array of s is too small to fit all the given values a bigger array will be allocated. The returned slice will point to the newly allocated array.
+```
 
 ----
 # Go内存管理之代码的逃逸分析
@@ -418,7 +423,7 @@ func main() {
 [10 20 30 0 0 0 0 0 0 0]
 ```
 
-go的切片传递，更改了数据会影响外层，但是外层的len没有变化。
+**go的切片传递，更改了数据会影响外层，但是外层的len没有变化**。
 
 
 
@@ -538,3 +543,110 @@ var _ = ([]int)(nil) == nil
 var _ = (map[string]int)(nil) == nil
 var _ = (func())(nil) == nil
 ```
+
+> - [深度剖析 Go 的 nil - 掘金](https://juejin.cn/post/6950053304650956807)
+
+从类型定义得到**两个关键点**：
+
+1.  `nil` 本质上是一个 `Type` 类型的变量而已；
+2.  `Type` 类型仅仅是基于 `int` 定义出来的一个新类型；
+
+而从 `nil` 官方的注释中，我们可以得到一个重要信息：
+
+**划重点**：`nil` 适用于 **指针**，**函数**，`interface`，`map`，`slice`，`channel` 这 6 种类型。
+
+
+通过上面，我们理解了几个东西：
+
+1.  Go 的类型定义仅比 C 多做了一件事，把分配的内存块置 0，而已；
+2.  能够和 nil 值做判断的，仅仅有 6 个类型。如果你用来其他类型来和 nil 比较，那么在编译期间 `typecheck` 会报错检查到会报错；
+
+
+**p是个空指针（nil），但是可以成功地调用其成员方法**，基于此我们则可以对二叉树的例子做一些优化，代码简洁了许多，也消除了风险：
+
+空指针的地址都是一样的  空指针的地址都是0x0，无论类型是什么。
+
+
+
+> - [面试官：两个nil比较结果是什么？](https://mp.weixin.qq.com/s/CNOLLLRzHomjBnbZMnw0Gg)
+
+输出结果是`false`，在`Todo`方法内我们声明了一个变量`res`，这个变量是一个指针类型，零值是`nil`，返回的是接口类型，按理说返回值接口类型也应是`nil`才对，但是结果却不是这样。这是因为我们忽略了接口类型的一个概念，interface 不是单纯的值，而是分为类型和值。所以必须要类型和值同时都为 `nil` 的情况下，`interface` 的 `nil` 判断才会为 `true`。
+
+根据运行结果我们可以看出，一个`nil`的`map`可以读数据，但是不可以写入数据，否则会发生`panic`，所以要使用`map`一定要使用`make`进行初始化。
+
+根据运行结果我们可以得出关闭一个`nil`的`channel`会导致程序`panic`，在使用上我们要注意这个问题，还有有一个需要注意的问题：**一个`nil`的`channel`读写数据都会造成永远阻塞。**
+
+一个为`nil`的索引，不可以进行索引，否则会引发`panic`，其他操作是可以。
+
+这里我们用了`0x0`做了一个小实验，正好证明了空指针就是一个没有指向任何值的指针。
+
+
+
+---
+# Go 语言中值 receiver 和指针 receiver 的对比
+[Go 语言中值 receiver 和指针 receiver 的对比（收集的一些资料） - 茶歇驿站 - Gopher, OpenSource Fans, 成长之路有我相伴。](https://maiyang.me/post/2018-12-12-values-receiver-vs-pointer-receiver-in-golang/)
+
+什么时候使用指针接收器
+
+如果要在方法中更改接收器的状态，操纵它的值，请使用指针接收器。 使用值接收器是不可能的，它按值复制（对值接收器的任何修改都是该副本的本地修改）。
+
+如果您定义方法的结构非常大，复制它将比使用值接收器代价更大。
+
+值接收器在原始类型值的副本上运行，这意味着涉及成本，特别是如果结构非常大，并且接收的指针更有效。
+
+什么时候使用值接收器
+
+如果您不需要编辑接收器值，请使用值接收器。
+
+值接收器是并发安全的，而指针接收器不是并发安全的。
+
+有一种情况，您可能希望将指针接收器用于通常使用值接收器的方法，并且当您在该类型上定义了其他指针接收器时，为了保持一致性，您应该在所有方法中使用指针接收器。
+
+
+---
+# GO 指针
+
+> - [深入理解 Golang 指针 - 掘金](https://juejin.cn/post/6844903961615400973)
+
+pointer 和 value 类型作为 receiver 有什么区别？主要在于你是否需要修改receiver，有如下几个注意事项：
+
+- 如果你需要修改receiver，那必须是pointer；
+- 因为 slice 和 map 是引用类型，因此这里有点微妙，他们以value作为 receiver 是可以修改receiver 的，**但是如果要修改自身属性，比如slice的长度，那还是需要以pointer作为receiver**；
+- 如何receiver很大，例如一个很大的结构，那么 pointer receiver性能会更佳。可以参考从内存分配策略(堆、栈)的角度分析,函数传递指针真的比传值效率高吗？；
+- 官方建议如果类型的某些方法具有 pointer receiver，那么其余的方法也保持一致，使得方法集一致；
+- 对于基础类型、小型slice、map之类，除非强制要求，否则使用value receiver的将很高效和清晰
+
+> slice的len修改例子可以见上面的[切片](#切片)章节
+
+
+---
+# GO 逃逸分析
+> - [go_blog/Escape.md at master · lvgithub/go_blog](https://github.com/lvgithub/go_blog/blob/master/Escape/Escape.md)
+
+
+要找到区别，那肯定需要下功夫，那就从 Golang 的实现机制中来分析吧。首先，在Golang 中有一个很重要的概念那就是 逃逸分析（Escape analysis），所谓的逃逸分析指由编译器决定内存分配的位置。
+
+*   分配在 栈中，则函数执行结束可自动将内存回收
+*   分配在 堆中，则函数执行结束可交给GC（垃圾回收）处理
+
+最终程序的执行效率和这个两种分配规则是有这重要关联的，而传值和传指针的主要区别在于底层值是否需要拷贝,表面上看传指针不涉及值拷贝，效率肯定更高。但是实际情况是指传针会涉及到变量逃逸到堆上，而且会增加GC的负担，所以本文我们要做的内容就是进行 逃逸分析 ,安装惯例先上结论。
+
+*   栈上分配内存比在堆中分配内存有更高的效率
+*   栈上分配的内存不需要GC处理,函数执行后自动回收
+*   堆上分配的内存使用完毕会交给GC处理
+*   发生逃逸时，会把栈上的申请的内存移动到堆上
+*   指针可以减少底层值的拷贝，可以提高效率，但是会产生逃逸，但是如果拷贝的数据量小，逃逸造成的负担（堆内存分配+GC回收)会降低效率
+*   因此选择值传递还是指针传递，变量的大小是一个很重要的分析指标
+
+每种方式都有各自的优缺点，栈上的值，减少了 GC 的压力,但是要维护多个副本，堆上的指针，会增加 GC 的压力，但只需维护一个值。因此选择哪种方式，依据自己的业务情况参考这个标准进行选择。
+
+所以 makePerson 返回的是指针类型，发生了逃逸，而showPerson 返回的是值类型没有逃逸。
+
+关于变量逃逸的情况还有很多，网上有很多分析的文章，就不一一举例了，直接给出结论:
+
+* 共享了栈上的一个值时，它就会逃逸
+* 栈空间不足逃逸（比如创建一个超大的slice,超过栈空间）
+* 动态类型逃逸，函数参数为interface类型（典型的fmt.Println方法）
+* 闭包引用对象逃逸，其实本质还是共享了栈上的值
+
+

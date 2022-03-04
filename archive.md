@@ -46,6 +46,10 @@
 - [关于 Golang 错误处理的一些思考](https://mp.weixin.qq.com/s?__biz=MzAxMTA4Njc0OQ==&mid=2651441294&idx=3&sn=bb20e907f3886961777c2368e8d05cdd&chksm=80bb167cb7cc9f6a1bca359641a9eaa2316fc57f016ca6cab3cd4f13f101874594c7291b06ee&scene=21#wechat_redirect): 创建错误的形式，处理方法error、xerror，一些提案
 - [一套优雅的 Go 错误问题解决方案](https://mp.weixin.qq.com/s/RFF2gSikqXiWXIaOxQZsxQ): 对常见错误处理的简单明了的总结
 
+## 指针
+
+- [深度剖析 Go 的 nil - 掘金](https://juejin.cn/post/6950053304650956807): 对nil值的深入理解！
+
 ## 其他
 - [[]T 还是 []*T, 这是一个问题](https://colobu.com/2017/01/05/-T-or-T-it-s-a-question/): 只是说明了副本创建的各种情况
 - [深度解密Go语言之关于 interface 的10个问题](https://www.cnblogs.com/qcrao-2018/p/10766091.html): 值接收者和指针接收者的区别
