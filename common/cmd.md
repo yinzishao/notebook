@@ -121,6 +121,7 @@ tail -1000 /var/log/syslog | grep -i kill
 
 # curl --fail
 
+
 ```bash
 STATUSCODE=$(curl --silent --output /dev/stderr --write-out "%{http_code}" URL)
 
@@ -647,6 +648,16 @@ cat < /dev/fd/63
 If the -c option is present, then commands are read from the first non-option argument command_string.
 If there are arguments after the command_string, they are
 assigned to the positional parameters, starting with $0.
+```
+
+
+```shell
+bash -c "
+if [ $(curl -s -o >(cat >&1) -w "%{http_code}" -L -X POST 'http://10.248.157.64:6689/byteconf/admin/ppe/clean' --header 'Cookie: ak=byteconf; c_token=yv1mgxxPeg91by07UfWMlg%3D%3D' --header 'Content-Type: application/json' --data '{}' ) == 200 ]
+then exit 1
+else exit 0
+fi
+"
 ```
 
 ## -s
