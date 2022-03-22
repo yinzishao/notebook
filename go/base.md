@@ -1,3 +1,40 @@
+# go类理解
+
+
+通过声明其他的Struct来达到继承的目的。注意两个点：
+
+- 继承后的声明还是要通过显式struct的方式进行声明。
+- 声明的基类的是指针还是非指针的区别，在于new空新的struct的空指针问题。
+
+
+```go
+
+type Person struct {
+	*Skill
+	Name string
+}
+
+type Skill struct {
+	Method string
+}
+```
+
+
+```go
+a := &Person{Name: "1"}
+
+// 这样不能赋值，因为初始化不能匿名继承！
+//a := &Person{Name: "1", Method: "123"}
+
+// a.Method = "33"  // 出错panic: runtime error: invalid memory address or nil pointer dereference [recovered]
+// 如果Person的Skill为*Skill，则初始化structure的时候会初始化为空值指标。而不是指针的时候，则初始化想要的结构体
+```
+
+
+
+
+
+
 # 一文理解Go中的内存分配
 
 > - [一文理解Go中的内存分配](https://mp.weixin.qq.com/s/UARz-SexNbF5pRQt7NveZQ): 测试例子证明尽量避免堆分配
