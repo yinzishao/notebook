@@ -359,6 +359,9 @@
     - getMapNil 返回了nil，但是下面的判断条件没有进行回滚。
 - [解决Linux TIME_WAIT过多造成的问题](https://blog.csdn.net/zhangjunli/article/details/89321202): 具体源码分析。
 
+## rpc
+- [思考gRPC ：为什么是HTTP/2 | 横云断岭的专栏](https://hengyun.tech/thinking-about-grpc-http2/)
+- [gRPC系列(三) 如何借助HTTP2实现传输 - 知乎](https://zhuanlan.zhihu.com/p/161577635)
 
 ---
 # 算法
