@@ -1,0 +1,2 @@
+- [Scrum（迭代式增量软件开发过程）_百度百科](https://baike.baidu.com/item/Scrum/1698901?fr=aladdin)
+- [DevOps（过程、方法与系统的统称）_百度百科](https://baike.baidu.com/item/DevOps/2613029?fr=aladdin)
