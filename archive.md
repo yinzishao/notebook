@@ -1,6 +1,9 @@
 # go
 - [go](./go)
 
+## 语法
+- [Go 常见错误集锦 | 字符串底层原理及常见错误-原创分享-GoCN社区](https://gocn.vip/topics/Go488nfroE)
+
 ## GMP
 - [goroutine](./go/goroutine.md)
 
@@ -60,11 +63,13 @@
 - [golang中多goroutine操作map时直接赋值不用加锁？](https://github.com/Terry-Mao/gopush-cluster/issues/44): cow和指针赋值不能确保是原子行为 [谈谈go语言编程的并发安全](http://yanyiwu.com/work/2015/02/07/golang-concurrency-safety.html) [copy-on-write技术](https://chunlife.top/2019/09/03/copy-on-write%E6%8A%80%E6%9C%AF/)
 - [benchmark 基准测试 | Go 语言高性能编程 | 极客兔兔](https://geektutu.com/post/hpg-benchmark.html)
 
+- [golang：快来抓住让我内存泄漏的“真凶”！](https://mp.weixin.qq.com/s/O84T-8NcU5aW8BhmbprvJg): golang10次内存泄漏，8次goroutine泄漏，1次是真正内存泄漏，还有1次是cgo导致的内存泄漏。
 
 ## 网络
 - [Go netpoller 原生网络模型之源码全面揭秘](https://strikefreedom.top/go-netpoll-io-multiplexing-reactor): 从源码和例子分析。引出reactor对比分析、gnet等。简单介绍了select、epoll的代码结束，而且详细对比了分析各自的优缺点，并且很好的从源码分析了几个问题，但是没有再深入介绍？。TODO
 - [如何优化 Go HTTP client 的性能](https://www.loginradius.com/blog/async/tune-the-go-http-client-for-high-performance/): Client的Timeout参数与DefaultMaxIdleConnsPerHost
 - [在 golang 中是如何对 epoll 进行封装的？](https://mp.weixin.qq.com/s/hjWhh_zHfxmH1yZFfvu_zA): 详细的底层代码介绍
+- [i/o timeout ， 希望你不要踩到这个net/http包的坑](https://mp.weixin.qq.com/s/5d1tyFKBKYzeDgWzDrefOQ): 长连接的超时设置，源码解析。触发器的生成，设置pd.rd为-1。
 
 ## etcd
 - [跟 etcd 学习数据库中事务隔离的实现](https://blog.betacat.io/post/2019/08/learn-transaction-isolation-levels-from-etcd/)
@@ -362,6 +367,9 @@
 ## rpc
 - [思考gRPC ：为什么是HTTP/2 | 横云断岭的专栏](https://hengyun.tech/thinking-about-grpc-http2/)
 - [gRPC系列(三) 如何借助HTTP2实现传输 - 知乎](https://zhuanlan.zhihu.com/p/161577635)
+- [使用Envoy将gRPC转码为HTTP/JSON · Service Mesh|服务网格中文社区](https://www.servicemesher.com/blog/transcoding-grpc-to-http-json-using-envoy/)
+- [你不知道的gRPC反向代理 - 云+社区 - 腾讯云](https://cloud.tencent.com/developer/article/1242108)
+- [从源码透析gRPC调用原理 - 云+社区 - 腾讯云](https://cloud.tencent.com/developer/article/1189548)
 
 ---
 # 算法
