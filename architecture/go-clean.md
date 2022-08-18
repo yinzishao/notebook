@@ -143,6 +143,12 @@
 
 通过依赖倒转的原则，进行各种模块间的调用。高层模块不直接依赖低层的实现，而是依赖于低层模块的抽象。（依赖注入）
 
+> Q: 对于不同的实体，如果在仓库层已经足够，则没有必要进行用例层的实现？A: 不能？避免仓库层暴露给表现层？
+
+> UseCase、Repo、表现层都是放在同一个包里，也就是一个领域里的。
+
+
+
 ---
 # 参考链接
 - [The Clean Code Blog](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html): by Robert C. Martin (Uncle Bob)
