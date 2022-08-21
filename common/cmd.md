@@ -1,3 +1,20 @@
+# set -e
+
+> -["set -e" 与 "set -o pipefail" - 墨天轮](https://www.modb.pro/db/226858)
+
+```bash
+# set -o pipefail
+
+ls ./a.txt |echo "hi" >/dev/null
+
+echo $?
+
+# 1 ls: ./a.txt: No such file or directory
+# 0 没有set -o pipefail，默认返回最后一个管道命令的返回值
+
+```
+
+
 # 日期
 
 > -[Shell 按日期循环执行](https://sjq597.github.io/2015/11/03/Shell-%E6%8C%89%E6%97%A5%E6%9C%9F%E5%BE%AA%E7%8E%AF%E6%89%A7%E8%A1%8C/)
