@@ -390,6 +390,7 @@
 - [我们为什么要用IoC和AOP](https://www.jianshu.com/p/feb9521388cf): 本质是组件的调用方参与了组件的创建和配置工作。
 - [如何来一次说干就干的重构 (流程篇)](https://cloud.tencent.com/developer/article/1415577): 重构的级别。架构级别重构，如通过分层使业务解耦，引入缓存设计提升系统高并发等。
 - [【译】The Clean Architecture](https://zhuanlan.zhihu.com/p/64343082): 简洁架构
+- [后端开发实践系列——领域驱动设计(DDD)编码实践 - Thoughtworks洞见](https://insights.thoughtworks.cn/backend-development-ddd/)
 
 ## DDD
 - [后端开发实践系列——领域驱动设计(DDD)编码实践 - Thoughtworks洞见](https://insights.thoughtworks.cn/backend-development-ddd/)
