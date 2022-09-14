@@ -12,7 +12,7 @@ ApplicationService需要遵循以下原则：
 
 ## 聚合根的家——资源库
 
-通俗点讲，资源库(Repository)就是用来持久化聚合根的。从技术上讲，Repository和DAO所扮演的角色相似，不过DAO的设计初衷只是对数据库的一层很薄的封装，而Repository是更偏向于领域模型。另外，在所有的领域对象中，只有聚合根才“配得上”拥有Repository，而DAO没有这种约束。
+通俗点讲，**资源库(Repository)就是用来持久化聚合根的**。从技术上讲，Repository和DAO所扮演的角色相似，不过DAO的设计初衷只是对数据库的一层很薄的封装，而Repository是更偏向于领域模型。另外，在所有的领域对象中，只有聚合根才“配得上”拥有Repository，而DAO没有这种约束。
 
 在OrderRepository中，我们只定义了save()和byId()方法，分别用于保存 / 更新聚合根和通过 ID 获取聚合根。这两个方法是 Repository 中最常见的方法，有的 DDD 实践者甚至认为一个纯粹的 Repository 只应该包含这两个方法。读到这里，你可能会有些疑问：为什么 OrderRepository中没有更新和查询等方法？
 
@@ -24,6 +24,7 @@ ApplicationService需要遵循以下原则：
 
 ![](.ddd_images/68bcf45b.png)
 
+> 重点思路
 
 # DDD在Golang中的落地
 
